@@ -27,10 +27,15 @@ VOID EFIAPI ProcessLibraryConstructorList(VOID);
 VOID UartInit(VOID)
 {
   SerialPortInitialize();
+  MmioWrite32(0x12860070,0x1281);
+  UINT8 *base = (UINT8 *)0xCC000000ull;
+  for (UINTN i = 0; i < 0x01400000; i++) {
+    base[i] = 0;
+  }
 
-  DEBUG((EFI_D_INFO, "\nPEdeka on sexynos (AArch64)\n"));
+  DEBUG((EFI_D_INFO, "\nEDK2 on Samsung Galaxy S8 (AArch64)\n"));
   DEBUG(
-      (EFI_D_INFO, "Firmware version %s built %a %a\n\n",
+      (EFI_D_INFO, "UEFI firmware version %s built %a %a\n\n",
        (CHAR16 *)PcdGetPtr(PcdFirmwareVersionString), __TIME__, __DATE__));
 }
 
@@ -52,19 +57,6 @@ VOID Main (IN  UINT64  StartTimeStamp)
 
   /* Enable program flow prediction, if supported */
   ArmEnableBranchPrediction();
-
-void setFBcolor(char* colors) {
-    char* base = (char*)0x0ec000000ull;
-    for (int i = 0; i < 0x00800000; i += 4) {
-        base[i] = colors[0];      // Blue component
-        base[i + 1] = colors[1];  // Green component
-        base[i + 2] = colors[2];  // Red component
-        base[i + 3] = 255;        // Full opacity
-    }
-}
-
-    char colors[3] = {0, 0, 0}; // Blue color (RGB format)
-    setFBcolor(colors);
 
   // Declare UEFI region
   MemoryBase     = FixedPcdGet32(PcdSystemMemoryBase);
